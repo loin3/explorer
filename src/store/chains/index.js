@@ -114,10 +114,10 @@ export default {
     async getAllDenomsMetadata(context, _this) {
       _this.$http.getAllDenomsMetadata().then(async metadatas => {
         const assets = metadatas.map(metadata => {
-          console.log(metadata)
           const base = metadata.base ? metadata.base : metadata.denom_units.find(denomUnit => denomUnit.exponent === 0).denom
-          const symbol = metadata.display ? metadata.display : metadata.denom_units.reduce((previousDenomUnit, currentDenomUnit) => (previousDenomUnit.exponent > currentDenomUnit ? previousDenomUnit : currentDenomUnit)).denom
-          const exponent = metadata.denom_units.find(denomUnit => denomUnit.denom === symbol).exponent.toString()
+          const display = metadata.display ? metadata.display : metadata.denom_units.reduce((previousDenomUnit, currentDenomUnit) => (previousDenomUnit.exponent > currentDenomUnit ? previousDenomUnit : currentDenomUnit)).denom
+          const exponent = metadata.denom_units.find(denomUnit => denomUnit.denom === display).exponent.toString()
+          const symbol = metadata.symbol ? metadata.symbol : display
 
           return {
             base, symbol, exponent, coingecko_id: '', logo: '',
