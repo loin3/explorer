@@ -127,6 +127,10 @@ export default class ChainFetch {
     return this.get('/cosmos/bank/v1beta1/supply').then(data => data.supply)
   }
 
+  async getAllDenomsMetadata() {
+    return this.get('/cosmos/bank/v1beta1/denoms_metadata').then(data => data.metadatas)
+  }
+
   async getStakingPool() {
     return this.get('/staking/pool').then(data => new StakingPool().init(commonProcess(data)))
   }
