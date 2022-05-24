@@ -77,6 +77,10 @@ export default {
     setIBCPaths(state, paths) {
       state.ibcPaths = paths
     },
+    setDenomsMetadata(state, { chainName, updatedAssets }) {
+      state.config[chainName].assets = updatedAssets
+      localStorage.setItem('chains', JSON.stringify(state.config))
+    },
   },
   actions: {
     async getQuotes(context) {
@@ -104,6 +108,35 @@ export default {
         })
         context.commit('setIBCDenoms', denomsMap)
         context.commit('setIBCPaths', pathsMap)
+      })
+    },
+
+    async getAllDenomsMetadata(context, _this) {
+      _this.$http.getAllDenomsMetadata().then(async metadatas => {
+        const assets = metadatas.map(metadata => {
+          console.log(metadata)
+          const base = metadata.base ? metadata.base : metadata.denom_units.find(denomUnit => denomUnit.exponent === 0).denom
+          const symbol = metadata.display ? metadata.display : metadata.denom_units.reduce((previousDenomUnit, currentDenomUnit) => (previousDenomUnit.exponent > currentDenomUnit ? previousDenomUnit : currentDenomUnit)).denom
+          const exponent = metadata.denom_units.find(denomUnit => denomUnit.denom === symbol).exponent.toString()
+
+          return {
+            base, symbol, exponent, coingecko_id: '', logo: '',
+          }
+        })
+
+        const chainName = (await _this.$http.getSelectedConfig()).chain_name
+        const filterAssets = assets.filter(asset => {
+          let exist = false
+          chains[chainName].assets.forEach(temp => {
+            if (temp.base.toLowerCase() === asset.base.toLowerCase() || temp.symbol.toLowerCase() === asset.symbol.toLowerCase()) {
+              exist = true
+            }
+          })
+          return !exist
+        })
+
+        const updatedAssets = [...chains[chainName].assets, ...filterAssets]
+        context.commit('setDenomsMetadata', { chainName, updatedAssets })
       })
     },
   },
