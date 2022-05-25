@@ -183,6 +183,7 @@ export default {
       if (isVisible && !idle.loaded) {
         this.$set(idle, 'loaded', true)
         this.fetch(chain.chain_name)
+        this.$store.dispatch('chains/getAllDenomsMetadata', { _this: this, chainName: chain.chain_name })
       }
     },
   },

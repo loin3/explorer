@@ -96,7 +96,6 @@ export default {
   created() {
     store.dispatch('chains/getQuotes')
     store.dispatch('chains/getAllIBCDenoms', this)
-    store.dispatch('chains/getAllDenomsMetadata', this)
   },
 }
 </script>

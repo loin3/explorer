@@ -111,33 +111,30 @@ export default {
       })
     },
 
-    async getAllDenomsMetadata(context, _this) {
-      _this.$http.getAllDenomsMetadata().then(async metadatas => {
-        const assets = metadatas.map(metadata => {
-          const base = metadata.base ? metadata.base : metadata.denom_units.find(denomUnit => denomUnit.exponent === 0).denom
-          const display = metadata.display ? metadata.display : metadata.denom_units.reduce((previousDenomUnit, currentDenomUnit) => (previousDenomUnit.exponent > currentDenomUnit ? previousDenomUnit : currentDenomUnit)).denom
-          const exponent = metadata.denom_units.find(denomUnit => denomUnit.denom === display).exponent.toString()
-          const symbol = metadata.symbol ? metadata.symbol : display
+    async getAllDenomsMetadata(context, { _this, chainName }) {
+      const metadatas = await _this.$http.getAllDenomsMetadata(chains[chainName])
+      const assets = metadatas.map(metadata => {
+        const base = metadata.base ? metadata.base : metadata.denom_units.find(denomUnit => denomUnit.exponent === 0).denom
+        const display = metadata.display ? metadata.display : metadata.denom_units.reduce((previousDenomUnit, currentDenomUnit) => (previousDenomUnit.exponent > currentDenomUnit ? previousDenomUnit : currentDenomUnit)).denom
+        const exponent = metadata.denom_units.find(denomUnit => denomUnit.denom.toLowerCase() === display.toLowerCase()).exponent.toString()
+        const symbol = metadata.symbol ? metadata.symbol : display
 
-          return {
-            base, symbol, exponent, coingecko_id: '', logo: '',
+        return {
+          base, symbol, exponent, coingecko_id: '', logo: '',
+        }
+      })
+      const currentChainName = chainName || (await _this.$http.getSelectedConfig()).chain_name
+      const filterAssets = assets.filter(asset => {
+        let exist = false
+        chains[currentChainName].assets.forEach(temp => {
+          if (temp.base.toLowerCase() === asset.base.toLowerCase() || temp.symbol.toLowerCase() === asset.symbol.toLowerCase()) {
+            exist = true
           }
         })
-
-        const chainName = (await _this.$http.getSelectedConfig()).chain_name
-        const filterAssets = assets.filter(asset => {
-          let exist = false
-          chains[chainName].assets.forEach(temp => {
-            if (temp.base.toLowerCase() === asset.base.toLowerCase() || temp.symbol.toLowerCase() === asset.symbol.toLowerCase()) {
-              exist = true
-            }
-          })
-          return !exist
-        })
-
-        const updatedAssets = [...chains[chainName].assets, ...filterAssets]
-        context.commit('setDenomsMetadata', { chainName, updatedAssets })
+        return !exist
       })
+      const updatedAssets = [...chains[currentChainName].assets, ...filterAssets]
+      context.commit('setDenomsMetadata', { chainName: currentChainName, updatedAssets })
     },
   },
 }

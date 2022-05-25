@@ -155,6 +155,8 @@ export default {
       this.latestTime = toDay(res.block.header.time, 'long')
     })
 
+    this.$store.dispatch('chains/getAllDenomsMetadata', { _this: this })
+
     this.$http.getMarketChart().then(res => {
       this.marketData = res
     })
