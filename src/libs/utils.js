@@ -398,6 +398,7 @@ export function formatTokenAmount(tokenAmount, decimals = 2, tokenDenom = 'uatom
       if (asset) exp = asset.exponent
     }
   })
+  console.log(1)
   amount = Number(Number(tokenAmount)) / (10 ** exp)
   if (amount > 10) {
     if (format) { return numberWithCommas(parseFloat(amount.toFixed(decimals))) }
