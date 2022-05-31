@@ -403,6 +403,7 @@ export function formatTokenAmount(tokenAmount, decimals = 2, tokenDenom = 'uatom
     if (format) { return numberWithCommas(parseFloat(amount.toFixed(decimals))) }
     return parseFloat(amount.toFixed(decimals))
   }
+  console.log('formatTokenAmount', amount, amount.toFixed(exp), exp)
   return parseFloat(amount.toFixed(exp))
 }
 
@@ -415,6 +416,7 @@ export function formatToken(token, IBCDenom = {}, decimals = 2, withDenom = true
   if (token) {
     const denom = IBCDenom[token.denom] || token.denom
     if (withDenom) {
+      console.log('formatToken', token, denom)
       return `${formatTokenAmount(token.amount, decimals, denom)} ${formatTokenDenom(denom)}`
     }
     return formatTokenAmount(token.amount, decimals, denom)
@@ -434,6 +436,7 @@ export function formatNumber(count, withAbbr = false, decimals = 2) {
 }
 
 export function tokenFormatter(tokens, denoms = {}) {
+  console.log(tokens, denoms)
   if (Array.isArray(tokens)) {
     return tokens.map(t => formatToken(t, denoms, 2)).join(', ')
   }
